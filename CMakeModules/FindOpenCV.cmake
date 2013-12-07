@@ -53,14 +53,19 @@ find_path(OpenCV_DIR "OpenCVConfig.cmake" DOC "Root directory of OpenCV")
 ##====================================================
 ## Find OpenCV libraries
 ##----------------------------------------------------
+message(STATUS "WARNING: OpenCV 0 ${OpenCV_DIR}")
 if(EXISTS "${OpenCV_DIR}")
-
+        message(STATUS "WARNING: OpenCV 1")
         #When its possible to use the Config script use it.
         if(EXISTS "${OpenCV_DIR}/OpenCVConfig.cmake")
-
+                message(STATUS "WARNING: OpenCV 2")
                 ## Include the standard CMake script
+                
+                message(STATUS "opencv configp ${OpenCV_CONFIG_PATH}")
                 include("${OpenCV_DIR}/OpenCVConfig.cmake")
-
+                
+                message(STATUS "opencv inc ${OpenCV_INCLUDE_DIR}")
+                 message(STATUS "opencv cmake ${OpenCV_DIR}/OpenCVConfig.cmake")
                 ## Search for a specific version
                 set(CVLIB_SUFFIX "${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}")
 
@@ -70,9 +75,10 @@ if(EXISTS "${OpenCV_DIR}")
                 set(OPENCV_LIB_COMPONENTS cxcore cv ml highgui cvaux)
                 find_path(OpenCV_INCLUDE_DIR "cv.h" PATHS "${OpenCV_DIR}" PATH_SUFFIXES "include" "include/opencv" DOC "")
                 if(EXISTS  ${OpenCV_INCLUDE_DIR})
+                        message(STATUS "WARNING: OpenCV 4")
                         include_directories(${OpenCV_INCLUDE_DIR})
                 endif(EXISTS  ${OpenCV_INCLUDE_DIR})
-
+                message(STATUS "opencv inc ${OpenCV_INCLUDE_DIR}")
                 #Find OpenCV version by looking at cvver.h
                 file(STRINGS ${OpenCV_INCLUDE_DIR}/cvver.h OpenCV_VERSIONS_TMP REGEX "^#define CV_[A-Z]+_VERSION[ \t]+[0-9]+$")
                 string(REGEX REPLACE ".*#define CV_MAJOR_VERSION[ \t]+([0-9]+).*" "\\1" OpenCV_VERSION_MAJOR ${OpenCV_VERSIONS_TMP})

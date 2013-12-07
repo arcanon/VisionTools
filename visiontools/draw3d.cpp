@@ -21,10 +21,12 @@
 // IN THE SOFTWARE.
 
 #include <iostream>
+#define EIGEN_NO_DEPRECATED_WARNING 1
 #include <Eigen/Eigenvalues>
 
-#include <sophus/se3.h>
-#include <sophus/sim3.h>
+
+#include <sophus/se3.hpp>
+#include <sophus/sim3.hpp>
 
 #include "draw3d.h"
 
@@ -100,6 +102,9 @@ void Draw3d
 ::points(const vector<GlPoint3f> & point_vec,
                     double pixel_size)
 {
+
+  if (point_vec.size() == 0)
+      return;
   glEnable(GL_POINT_SMOOTH);
   glEnableClientState(GL_VERTEX_ARRAY);
   glPointSize(pixel_size);
@@ -196,14 +201,15 @@ void Draw3d
 }
 
 void Draw3d
-::pose(const Sim3 & T_world_from_cam, double size)
+::pose(const Sim3d & T_world_from_cam, double size)
 {
   glPushMatrix();
   const Vector3d & center = T_world_from_cam.translation();
 
   glTranslate(center);
 
-  Vector4d axis_angle_scale = T_world_from_cam.scso3().log();
+  Vector7d axis_angle_scale = T_world_from_cam.log();
+      //.scso3().log();
   double angle = axis_angle_scale.head<3>().norm();
   if(angle != 0.)
   {

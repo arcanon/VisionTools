@@ -4,7 +4,7 @@ PROJECT(${PROJECT_NAME})
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules/")
 
-SET (OpenCV_DIR ${CMAKE_PREFIX_PATH}/share/OpenCV)
+#SET (OpenCV_DIR ${CMAKE_PREFIX_PATH}/share/OpenCV)
 
 SET (CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -24,10 +24,27 @@ ENDIF()
 SET (INCLUDE_DIRS )
 
 FIND_PACKAGE(OpenCV REQUIRED)
+LIST(APPEND INCLUDE_DIRS ${OpenCV_INCLUDE_DIRS})
+LIST(APPEND LIBS ${OpenCV_LIBS})
 FIND_PACKAGE(Eigen3 REQUIRED)
 LIST(APPEND INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 
+LIST(APPEND INCLUDE_DIRS ${LIB_Sophus})
+message(STATUS "sop ${LIB_Sophus}")
+
+find_package(GLEW REQUIRED)
+
+LIST(APPEND INCLUDE_DIRS ${GLEW_INCLUDE_DIR})
+LIST(APPEND LIBS ${GLEW_LIBRARY})
+
 SET (LIB_NAMES GL pangolin glut Sophus)
+
+find_package (OpenGL REQUIRED)
+if(OPENGL_FOUND)
+ set(LIB_GL ${OPENGL_LIBRARIES})
+endif(OPENGL_FOUND)
+
+LIST(APPEND INCLUDE_DIRS ${FREEGLUT_INCLUDE_DIR})
 
 FOREACH(lib ${LIB_NAMES})
   FIND_LIBRARY(LIB_${lib} ${lib})
@@ -38,6 +55,19 @@ FOREACH(lib ${LIB_NAMES})
   ENDIF (LIB_${lib})
   LIST(APPEND LIBS ${LIB_${lib}})
 ENDFOREACH(lib)
+
+include("${LIB_pangolin}/lib/cmake/Pangolin/PangolinConfig.cmake")
+LIST(APPEND INCLUDE_DIRS ${Pangolin_INCLUDE_DIRS})
+LIST(APPEND LIBS ${LIB_pangolin}/lib/pangolin.lib)
+
+message(STATUS " pang lib ${Pangolin_LIBRARY}")
+message(STATUS " pang lib2 ${Pangolin_LIBRARIES}")
+message(STATUS " pang inc ${Pangolin_INCLUDE_DIRS}")
+
+# this should be set by pangolin cmake file...
+find_package(Boost COMPONENTS thread filesystem system REQUIRED QUIET)
+message(STATUS " boost lib dir ${Boost_LIBRARY_DIR}")
+link_directories(${Boost_LIBRARY_DIR})
 
 SET (CLASSES  draw2d
               draw3d
@@ -60,7 +90,7 @@ ENDFOREACH(class)
 LINK_LIBRARIES (${PROJECT_NAME} ${LIBS})
 
 INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
-ADD_LIBRARY(${PROJECT_NAME} SHARED ${SOURCES})
+ADD_LIBRARY(${PROJECT_NAME} STATIC ${SOURCES})
 
 
 INSTALL(DIRECTORY visiontools DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h" )

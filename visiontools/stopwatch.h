@@ -24,9 +24,14 @@
 #define VISIONTOOLS_STOP_WATCH_H
 
 #include <cassert>
+#ifndef _WINDOWS
 #include <sys/time.h>
-#include <stdio.h>
 #include <unistd.h>
+#else
+#include <Windows.h>
+#endif
+#include <stdio.h>
+
 
 #include <stdexcept>
 
@@ -41,33 +46,55 @@ public:
   {
     running_ = false;
     time_ = 0;
+    QueryPerformanceFrequency(&perfFreq);
   }
+
+#if defined(_WINDOWS)
+  static LARGE_INTEGER perfFreq;
+#endif
 
   void start()
   {
+#ifndef _WINDOWS
     assert(running_==false);
     gettimeofday(&start_time_, NULL);
     running_ = true;
+#else
+      QueryPerformanceCounter(&start_time_);
+      running_ = true;
+#endif
   }
 
   void stop()
   {
     assert(running_);
+#ifndef _WINDOWS
     gettimeofday(&end_time_, NULL);
     long seconds  = end_time_.tv_sec  - start_time_.tv_sec;
     long useconds = end_time_.tv_usec - start_time_.tv_usec;
     time_ = ((seconds) + useconds*0.000001);
+#else
+    QueryPerformanceCounter(&end_time_);
+    time_ = ((double)(end_time_.QuadPart - start_time_.QuadPart))/perfFreq.QuadPart;
+#endif
     running_ = false;
   }
 
   double read_current_time()
   {
     assert(running_);
+#ifndef _WINDOWS
+    
     timeval cur_time;
     gettimeofday(&cur_time, NULL);
     long seconds  = cur_time.tv_sec  - start_time_.tv_sec;
     long useconds = cur_time.tv_usec - start_time_.tv_usec;
     return ((seconds) + useconds*0.000001);
+#else
+    LARGE_INTEGER cur_time;
+    QueryPerformanceCounter(&end_time_);
+    return ((double)end_time_.QuadPart/perfFreq.QuadPart);
+#endif
   }
 
   double get_stopped_time()
@@ -82,8 +109,13 @@ public:
   }
 
 private:
+#ifndef _WINDOWS
   timeval start_time_;
   timeval end_time_;
+#else
+  LARGE_INTEGER start_time_;
+  LARGE_INTEGER end_time_;
+#endif
   double time_;
   bool running_;
 };

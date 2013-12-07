@@ -23,7 +23,7 @@
 #ifndef VISIONTOOLS_SAMPLE_H
 #define VISIONTOOLS_SAMPLE_H
 
-#include <tr1/random>
+#include <random>
 
 namespace VisionTools
 {

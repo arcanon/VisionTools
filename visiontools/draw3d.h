@@ -26,11 +26,11 @@
 #include "gl_data.h"
 #include "linear_camera.h"
 
-namespace Sophus
-{
-class SE3;
-class Sim3;
-}
+//namespace Sophus
+//{
+//class SE3;
+//class Sim3;
+//}
 
 namespace VisionTools
 {
@@ -68,7 +68,7 @@ struct Draw3d
   pose                       (const SE3 & T_world_from_cam, double size = 0.1);
 
   static void
-  pose                       (const Sim3 & T_world_from_cam, double size = 0.1);
+  pose                       (const Sim3d & T_world_from_cam, double size = 0.1);
 
   static void
   line                       (const Vector3d & p1, const Vector3d & p2);

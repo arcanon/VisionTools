@@ -26,11 +26,17 @@ namespace VisionTools
 {
 using namespace std;
 
+#if defined(_WINDOWS)
+LARGE_INTEGER StopWatch::perfFreq;
+#endif
+
 PerformanceMonitor
 ::PerformanceMonitor()/*:
   ringbuffer_(30)*/
 {
 }
+
+
 
 void PerformanceMonitor
 ::setup(pangolin::DataLog * log)
